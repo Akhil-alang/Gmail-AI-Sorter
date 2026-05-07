@@ -1,0 +1,222 @@
+# Setup Guide — Gmail AI Sorter
+
+This guide explains how to install, configure, and run the Gmail AI Sorter project using n8n and Google Gemini AI.
+
+---
+
+# Overview
+
+The workflow automatically:
+
+* Monitors incoming Gmail emails
+* Uses Gemini AI to classify emails
+* Categorizes emails into:
+
+  * Meeting
+  * CheckLater
+  * JobVacancy
+* Applies Gmail labels automatically
+
+---
+
+# Prerequisites
+
+Before starting, ensure you have:
+
+* Gmail account
+* Google Gemini API key
+* n8n installed
+* Internet connection
+
+---
+
+# Step 1 — Install n8n
+
+## Option A — n8n Cloud
+
+Official Website:
+
+urln8n Cloud[https://n8n.io/cloud/](https://n8n.io/cloud/)
+
+Create an account and login.
+
+---
+
+## Option B — Local Installation Using Docker
+
+Install Docker first.
+
+Run:
+
+```bash
+docker run -it --rm \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  n8nio/n8n
+```
+
+Open:
+
+```text
+http://localhost:5678
+```
+
+---
+
+# Step 2 — Create Gmail Labels
+
+Inside Gmail create the following labels:
+
+```text
+Meeting
+CheckLater
+JobVacancy
+```
+
+## How to Create Labels
+
+1. Open Gmail
+2. Left sidebar → More
+3. Click:
+
+```text
+Create new label
+```
+
+4. Create labels one by one
+
+---
+
+# Step 3 — Generate Gemini API Key
+
+Open:
+
+urlGoogle AI Studio[https://aistudio.google.com/](https://aistudio.google.com/)
+
+## Steps
+
+1. Login with Google account
+2. Click:
+
+```text
+Get API Key
+```
+
+3. Generate API key
+4. Copy and save the key
+
+---
+
+# Step 4 — Create New Workflow in n8n
+
+## Steps
+
+1. Open n8n
+2. Click:
+
+```text
+New Workflow
+```
+
+3. Rename workflow:
+
+```text
+Gmail AI Sorter
+```
+
+---
+
+# Step 5 — Add Gmail Trigger Node
+
+## Add Node
+
+Search:
+
+```text
+Gmail Trigger
+```
+
+---
+
+## Configure Gmail Credentials
+
+1. Click:
+
+```text
+Create New Credential
+```
+
+2. Sign into Gmail
+3. Allow permissions
+
+---
+
+## Configure Node
+
+| Field     | Value   |
+| --------- | ------- |
+| Resource  | Message |
+| Operation | Watch   |
+| Label     | INBOX   |
+| Simplify  | Enabled |
+
+---
+
+# Step 6 — Add Gemini AI Node
+
+## Add Node
+
+Search:
+
+```text
+Google Gemini Chat Model
+```
+
+---
+
+## Configure Credentials
+
+Paste your Gemini API key.
+
+Save credentials.
+
+---
+
+# Step 7 — Add Basic LLM Chain
+
+## Add Node
+
+Search:
+
+```text
+Basic LLM Chain
+```
+
+Connect:
+
+```text
+Gmail Trigger → Basic LLM Chain
+```
+
+Attach Gemini model to the chain.
+
+---
+
+# Step 8 — Configure AI Prompt
+
+Inside Basic LLM Chain use:
+
+```text
+You are an intelligent email classifier.
+
+Classify the email into ONLY one category:
+
+- Meeting
+- CheckLater
+- JobVacancy
+
+Rules:
+- Meeting = interviews, calls, appointments
+- CheckLater = newsletters, promotions
+- JobVacancy = hiring, recruitment
+```
